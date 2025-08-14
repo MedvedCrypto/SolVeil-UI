@@ -665,6 +665,29 @@ const handleTransaction = async <T extends string | anchor.web3.TransactionSigna
                 </div>
               )}
             </div>
+
+            {/* 3. Delete account */}
+            <div className="button123 border border-[var(--color-accent)] rounded-lg overflow-hidden">
+              <button
+                onClick={() => toggleSection("transfer")}
+                className="w-full text-left px-4 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] transition font-medium"
+              >
+                Close account
+              </button>
+              {openSection === "transfer" && (
+                <div className="p-4 bg-[var(--color-light)] space-y-3">
+  
+                  {/* Delete buttons */}
+                  <button
+                    onClick={handleCloseAccount}
+                    disabled={isLoading}
+                    className="w-full bg-[var(--color-warning,#f59e0b)] hover:bg-yellow-600 text-white py-2 rounded-lg transition"
+                  >
+                    {isLoading ? "Processing..." : "Close account"}
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         )}
 

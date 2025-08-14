@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="900" viewBox="0 0 1800 900" fill="#1D1D1D">
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    .shape { 
+      filter: drop-shadow(0 4px 6px rgba(168, 85, 247, 0.3));
+      transition: filter 0.3s ease;
+    }
+    .shape:hover {
+      filter: drop-shadow(0 10px 15px rgba(236, 72, 153, 0.4));
+    }
+    .shape-inner {
+      transition: transform 0.3s ease;
+    }
+    .shape-inner:hover {
+      transform: scale(1.02);
+    }
+    .primary-fill { fill: url(#pinkPurpleGradient); }
+    .secondary-fill { fill: url(#darkPurpleGradient); }
+    .accent-fill { fill: #F472B6; }
+    .grid-line { stroke: #333; stroke-width: 1; stroke-opacity: 0.5; }
+  </style>
+
+  <defs>
+    <linearGradient id="pinkPurpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#A855F7" />
+    </linearGradient>
+    
+    <linearGradient id="darkPurpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6B21A8" />
+      <stop offset="100%" stop-color="#9333EA" />
+    </linearGradient>
+    
+    <clipPath id="clip0_403_274">
+      <rect width="1800" height="900" fill="white"/>
+    </clipPath>
+    
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Определение сетки с пропусками -->
+    <pattern id="grid" width="300" height="300" patternUnits="userSpaceOnUse">
+      <!-- Горизонтальные линии (пропуски в случайных местах) -->
+      <line x1="0" y1="0" x2="300" y2="0" class="grid-line" />
+      <line x1="0" y1="150" x2="300" y2="150" class="grid-line" style="visibility: hidden;" />
+      <line x1="0" y1="300" x2="300" y2="300" class="grid-line" />
+      <!-- Вертикальные линии (пропуски в случайных местах) -->
+      <line x1="0" y1="0" x2="0" y2="300" class="grid-line" />
+      <line x1="150" y1="0" x2="150" y2="300" class="grid-line" style="visibility: hidden;" />
+      <line x1="300" y1="0" x2="300" y2="300" class="grid-line" />
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#clip0_403_274)">
+    <!-- Фон с сеткой -->
+    <rect width="1800" height="900" fill="#1D1D1D"/>
+    <rect width="1800" height="900" fill="url(#grid)"/>
+
+    <!-- Элемент 1: Круг -->
+    <g class="shape" transform="translate(150, 150)">
+      <g class="shape-inner" style="animation: float 6s ease-in-out infinite;">
+        <path d="M115.107 0C115.107 63.5715 63.5715 115.107 0 115.107C-63.5715 115.107 -115.107 63.5715 -115.107 0C-115.107 -63.5715 -63.5715 -115.107 0 -115.107C63.5715 -115.107 115.107 -63.5715 115.107 0Z" class="primary-fill"/>
+      </g>
+    </g>
+
+    <!-- Элемент 2: Квадрат -->
+    <g class="shape" transform="translate(150, 450)">
+      <g class="shape-inner" style="animation: float 7s ease-in-out infinite 0.5s;">
+        <path d="M115.107 115.107H-115.107V-115.107H115.107V115.107Z" class="secondary-fill"/>
+      </g>
+    </g>
+
+    <!-- Элемент 3: Круг -->
+    <g class="shape" transform="translate(750, 150)">
+      <g class="shape-inner">
+        <path d="M115.107 0C115.107 63.5715 63.5715 115.107 0 115.107C-63.5715 115.107 -115.107 63.5715 -115.107 0C-115.107 -63.5715 -63.5715 -115.107 0 -115.107C63.5715 -115.107 115.107 -63.5715 115.107 0Z" class="secondary-fill"/>
+      </g>
+    </g>
+
+    <!-- Элемент 4: Квадрат -->
+    <g class="shape" transform="translate(1350, 150)">
+      <g class="shape-inner">
+        <path d="M115.107 115.107H-115.107V-115.107H115.107V115.107Z" class="primary-fill"/>
+      </g>
+    </g>
+
+    <!-- Элемент 5: Ромб -->
+    <g class="shape" transform="translate(300, 450)">
+      <g class="shape-inner" style="animation: float 5s ease-in-out infinite 1s;">
+        <path d="M101.863 115.081L51.1073 0L101.863 -115.081H254.834L305.59 0L254.834 115.081H101.863Z" class="accent-fill"/>
+      </g>
+    </g>
+
+    <!-- Элемент 6: Круг с пульсацией -->
+    <g class="shape" transform="translate(600, 500)">
+      <g class="shape-inner" style="animation: pulse 3s ease-in-out infinite;">
+        <path d="M115.107 0C115.107 63.569 63.569 115.107 0 115.107C-63.569 115.107 -115.107 63.569 -115.107 0C-115.107 -63.569 -63.569 -115.107 0 -115.107C63.569 -115.107 115.107 -63.569 115.107 0Z" fill="#1D1D1D"/>
+      </g>
+    </g>
+
+    <!-- Элемент 7: Стрелка -->
+    <g class="shape" transform="translate(1000, 350)">
+      <g class="shape-inner" style="animation: float 4s ease-in-out infinite 0.3s;">
+        <path d="M72 94C72 97 73 100 75 102 78 105 80 106 84 106 88 105 90 104 92.885 101.254L128.955 58.869 165.325 95.242 45.385 215.185-74.555 95.242-38.485 58.569-2.415 101.254C.19 104.461 3.295 106.064 6.905 106.064 10.115 106.064 12.72 104.861 14.725 102.456 16.925 100.251 18.025 97.446 18.025 94.039L18.025-15.031 72.455-15.031 72 94Z" class="secondary-fill"/>
+      </g>
+    </g>
+
+    <!-- Элемент 8: Шестиугольник с глоу -->
+    <g class="shape" filter="url(#glow)" transform="translate(1175, 450)">
+      <g class="shape-inner" style="animation: pulse 3s ease infinite;">
+        <path d="M101.863 115.081L51.1073 0L101.863 -115.081H254.834L305.59 0L254.834 115.081H101.863Z" class="accent-fill"/>
+      </g>
+    </g>
+
+    <!-- Элемент 9: Стрелка -->
+    <g class="shape" transform="translate(400, 650)">
+      <g class="shape-inner">
+        <path d="M72 94C72 97 73 100 75 102 78 105 80 106 84 106 88 105 90 104 92.885 101.254L128.955 58.869 165.325 95.242 45.385 215.185-74.555 95.242-38.485 58.569-2.415 101.254C.19 104.461 3.295 106.064 6.905 106.064 10.115 106.064 12.72 104.861 14.725 102.456 16.925 100.251 18.025 97.446 18.025 94.039L18.025-15.031 72.455-15.031 72 94Z" class="primary-fill"/>
+      </g>
+    </g>
+  </g>
+</svg>

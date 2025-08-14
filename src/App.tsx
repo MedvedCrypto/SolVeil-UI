@@ -23,6 +23,8 @@ import { AnchorProvider } from "@coral-xyz/anchor";
 import { DataRecord, TxParams } from "./common/interfaces";
 import { MessageSigningWallet } from "./common/account/encryption";
 import { RequestAccountRotationArgs } from "./common/interfaces/registry";
+import * as anchor from '@project-serum/anchor';
+
 
 type Notification = {
   id: number;
@@ -144,65 +146,68 @@ const App: React.FC = () => {
 
     fetchBalance();
   }, [publicKey, connection, txHash, rpcUrl]);
+const handleTransaction = async <T extends string | anchor.web3.TransactionSignature>(
+  actionName: string,
+  createTx: () => Promise<T>,
+  successMessage: string
+) => {
+  if (!publicKey || !signTransaction) {
+    addNotification("Connect your wallet!", "error");
+    return;
+  }
+  setIsLoading(true);
+  addNotification(`${actionName}...`, "info");
 
-  const handleTransaction = async (
-    actionName: string,
-    createInstruction: () => Promise<anchor.web3.TransactionInstruction>,
-    successMessage: string
-  ) => {
-    if (!publicKey || !signTransaction) {
-      addNotification("Connect your wallet!", "error");
-      return;
-    }
-    setIsLoading(true);
-    addNotification(`${actionName}...`, "info");
-    try {
-      const txParams: TxParams = {
-        priorityFee: { k: 1, b: feeInput },
-        cpu: { k: 1, b: 600_000 },
-      };
-      const cuLimitIx = ComputeBudgetProgram.setComputeUnitLimit({
-        units: 600_000,
-      });
-      const cuPriceIx = ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: feeInput,
-      });
-      const instruction = await createInstruction();
+  try {
+    const result = await createTx();
+
+    // Если результат — это TransactionInstruction, подписываем и отправляем
+    if (result instanceof anchor.web3.TransactionInstruction) {
+      const cuLimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 });
+      const cuPriceIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: feeInput });
       const tx = new anchor.web3.Transaction()
         .add(cuPriceIx)
         .add(cuLimitIx)
-        .add(instruction);
+        .add(result);
       tx.feePayer = publicKey;
-      const { blockhash } = await connection.getLatestBlockhash("confirmed");
+
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
       tx.recentBlockhash = blockhash;
-      const signed = await signTransaction(tx);
-      const sig = await connection.sendRawTransaction(signed.serialize(), {
-        skipPreflight: false,
-      });
+
+      const signedTx = await signTransaction(tx);
+      const sig = await connection.sendRawTransaction(signedTx.serialize(), { skipPreflight: false });
       setTxHash(sig);
       addNotification(`Transaction sent: ${sig.slice(0, 10)}...`, "info");
-      await connection.confirmTransaction(
-        {
-          signature: sig,
-          blockhash,
-          lastValidBlockHeight: (await connection.getLatestBlockhash())
-            .lastValidBlockHeight,
-        },
-        "confirmed"
-      );
+
+      await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
       addNotification(successMessage, "success");
-    } catch (err) {
-      let errorMessage = `Error: ${err instanceof Error ? err.message : String(err)}`;
-      if (err instanceof SendTransactionError) {
-        const logs = await err.getLogs(connection);
-        errorMessage += `\nLogs: ${JSON.stringify(logs, null, 2)}`;
-      }
-      addNotification(errorMessage, "error");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
+      return sig;
     }
-  };
+
+    // Если результат — это сразу TransactionSignature
+    if (typeof result === "string") {
+      setTxHash(result);
+      addNotification(`Transaction sent: ${result.slice(0, 10)}...`, "info");
+      addNotification(successMessage, "success");
+      return result;
+    }
+
+    throw new Error("Unsupported transaction result type");
+  } catch (err) {
+    let errorMessage = `Error: ${err instanceof Error ? err.message : String(err)}`;
+
+    if (err instanceof SendTransactionError) {
+      const logs = await err.getLogs(connection);
+      errorMessage += `\nLogs: ${JSON.stringify(logs, null, 2)}`;
+    }
+
+    addNotification(errorMessage, "error");
+    console.error(err);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleQuery = async (
     actionName: string,

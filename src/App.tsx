@@ -146,7 +146,9 @@ const App: React.FC = () => {
 
     fetchBalance();
   }, [publicKey, connection, txHash, rpcUrl]);
-const handleTransaction = async <T extends string | anchor.web3.TransactionSignature>(
+
+
+const handleTransaction = async <T extends string | anchor.web3.TransactionInstruction>(
   actionName: string,
   createTx: () => Promise<T>,
   successMessage: string
@@ -161,7 +163,6 @@ const handleTransaction = async <T extends string | anchor.web3.TransactionSigna
   try {
     const result = await createTx();
 
-    // Если результат — это TransactionInstruction, подписываем и отправляем
     if (result instanceof anchor.web3.TransactionInstruction) {
       const cuLimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 600_000 });
       const cuPriceIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: feeInput });
@@ -184,7 +185,6 @@ const handleTransaction = async <T extends string | anchor.web3.TransactionSigna
       return sig;
     }
 
-    // Если результат — это сразу TransactionSignature
     if (typeof result === "string") {
       setTxHash(result);
       addNotification(`Transaction sent: ${result.slice(0, 10)}...`, "info");
@@ -203,10 +203,13 @@ const handleTransaction = async <T extends string | anchor.web3.TransactionSigna
 
     addNotification(errorMessage, "error");
     console.error(err);
+
+    throw err;
   } finally {
     setIsLoading(false);
   }
 };
+
 
 
   const handleQuery = async (
@@ -320,7 +323,7 @@ const handleTransaction = async <T extends string | anchor.web3.TransactionSigna
       "Reopen account",
       () =>
         registryHelpers.tryReopenAccount(
-          { maxDataSize: 1_000 },
+          { maxDataSize: maxDataSize },
           { priorityFee: { k: 1, b: feeInput }, cpu: { k: 1, b: 600_000 } },
           true
         ),
@@ -343,11 +346,13 @@ const handleTransaction = async <T extends string | anchor.web3.TransactionSigna
   };
 
   // Handle createAccount transaction
-  const handleCreateAccount = async () => {
-    if (maxDataSize <= 0) {
-      addNotification("Maximum data size must be greater than 0!", "error");
-      return;
-    }
+const handleCreateAccount = async () => {
+  if (maxDataSize <= 0) {
+    addNotification("Maximum data size must be greater than 0!", "error");
+    return;
+  }
+
+  try {
     await handleTransaction(
       "Create account",
       async () => {
@@ -356,13 +361,16 @@ const handleTransaction = async <T extends string | anchor.web3.TransactionSigna
           feeInput,
           true
         );
+
         const txParams: TxParams = {
           priorityFee: { k: 1, b: feeInput },
           cpu: { k: simResult.cu, b: 5000 },
         };
+
         const revenueMint = new PublicKey(
           "fPcP9vGoowPikgu7oTRCJKHUvSNn9N5WZhYshR4UXyo"
         );
+
         return await registryHelpers.tryCreateAndActivateAccount(
           maxDataSize,
           revenueMint,
@@ -372,9 +380,20 @@ const handleTransaction = async <T extends string | anchor.web3.TransactionSigna
       },
       "Account created successfully!"
     );
-  };
+  } catch (err) {
+    // addNotification(
+    //   "Failed to create account, attempting to reopen existing account...",
+    //   "error"
+    // );
+    // console.error(err);
+    
 
-  // Handle writeData
+    console.log("    await handleReopenAccount();")
+    await handleReopenAccount();
+  }
+};
+
+
   const handleWrite = async () => {
     if (!signMessage) {
       addNotification("Wallet doesn't support message signing!", "error");

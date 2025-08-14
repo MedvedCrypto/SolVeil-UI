@@ -688,12 +688,12 @@ const handleCreateAccount = async () => {
             {/* 3. Delete account */}
             <div className="button123 border border-[var(--color-accent)] rounded-lg overflow-hidden">
               <button
-                onClick={() => toggleSection("transfer")}
+                onClick={() => toggleSection("close")}
                 className="w-full text-left px-4 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-accent)] transition font-medium"
               >
                 Close account
               </button>
-              {openSection === "transfer" && (
+              {openSection === "close" && (
                 <div className="p-4 bg-[var(--color-light)] space-y-3">
   
                   {/* Delete buttons */}

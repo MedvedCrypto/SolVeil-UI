@@ -9,6 +9,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },
   "dependencies": {
+    "tweetnacl": "^1.0.3",
     "@chain-registry/keplr": "^2.0.13",
     "@coral-xyz/anchor": "^0.31.1",
     "@coral-xyz/borsh": "^0.31.1",

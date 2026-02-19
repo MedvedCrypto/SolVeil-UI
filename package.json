@@ -8,9 +8,6 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },
-  "overrides": {
-    "@coral-xyz/anchor": "0.31.1"
-  },
   "dependencies": {
     "tweetnacl": "^1.0.3",
     "@chain-registry/keplr": "^2.0.13",
